@@ -1,8 +1,10 @@
 % requires the hyperref package
+% also requires graphicx
 
 \section{The Control System}
 
 This section describes the embedded control system and user interaction.
+The latest system software and documentation can always be found on github at \url{https://github.com/hedj/fusion/}.
 
 \subsection{The Bank Controller}
 
@@ -15,7 +17,14 @@ Arduino-based programmable-logic controller. The bank controller is in charge of
   \item{Audible alert before pulse}
 \end{itemize}
 
-The latest system software can always be found on github at \url{https://github.com/hedj/fusion/v2/}.
+The top-level flow of the bank controller is shown in Fig.~\ref{fig:toplevelbank}.
+
+\begin{figure}
+  \includegraphics[width=400px]{top-level-flowchart.png}
+\caption{\label{fig:toplevelbank}}
+\end{figure}
+
+
 
 \subsection{The Stepper Controller}
 \subsection{The IRC Server}
