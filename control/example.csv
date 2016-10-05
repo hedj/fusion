@@ -1,0 +1,7 @@
+# Cap_Voltage, HV_Voltage, HV_Pulse_Start, HV_Pulse_Stop, Bank1_Start, Bank2_Start, Bank3_Start, Bank4_Start, Stepper Increment
+ 900, 20000, 0, 100000, 0, 0, 0, 0, 5
+ 400, 20000, 0, 100000, 0, 0, 0, 0, 5
+ 400, 20000, 0, 100000, 0, 0, 0, 0, 5
+ 400, 20000, 0, 100000, 0, 0, 0, 0, 5
+ 400, 20000, 0, 100000, 0, 0, 0, 0, 5
+ 400, 20000, 0, 100000, 0, 0, 0, 0, 5
