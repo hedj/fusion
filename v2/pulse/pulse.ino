@@ -639,6 +639,7 @@ void do_pulse_step() {
     if ( d <= (bpw[NBANKS] + bpd[NBANKS]) && d >= bpd[NBANKS]  ) {
       digitalWrite(TRIG_OUTPUT_PINS[NBANKS], HIGH);
       all_done = false;
+      return;
     } else {
       digitalWrite(TRIG_OUTPUT_PINS[NBANKS], LOW);
       all_done = true;
