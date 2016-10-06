@@ -8,6 +8,11 @@ The latest system software and documentation can always be found on github at \u
 
 Flowcharts in this section use the visual language from the DRAKON project. See \url{http://drakon-editor.sourceforge.net/language.html} for details.
 
+\begin{figure}
+  \includegraphics[width=400px]{system_structure.png}
+\caption{\label{fig:system} Overall system design}
+\end{figure}
+
 \subsection{The Bank Controller}
 
 The bank controller is a \href{http://controllino.biz/product/controllino-mega/}{Controllino Mega}; an
@@ -22,7 +27,7 @@ Arduino-based programmable-logic controller. The bank controller is in charge of
 The top-level flow of the bank controller is shown in Fig.~\ref{fig:toplevelbank}.
 
 \begin{figure}
-  \includegraphics[width=400px]{top-level-flowchart.png}
+  \includegraphics[width=400px]{top_level.png}
 \caption{\label{fig:toplevelbank} Top-level flow of the bank controller}
 \end{figure}
 
@@ -30,9 +35,17 @@ The serial protocol used is nonstandard; a definition can be found at \url{https
 
 The most important thing to emphasise is that the controller is implemented as a tight loop reacting to the change in time. There are no blocking wait statements; in this way we ensure that input can continue to be received from the front panel switches or serial as the process runs. This allows the safe abort of the system regardless of its state, which is rather important.
 
-The two operations which consume a reasonable amount of time and are thus implemented as conditional actions in the inner loop are pulsing and charging, respectively Figs.~\ref{fig:pulse_step.png}~and~\ref{fig:charge_step.png}.
+The two operations which consume a reasonable amount of time and are thus implemented as conditional actions in the inner loop are pulsing and charging, respectively Figs.~\ref{fig:pulse_step}~and~\ref{fig:charge_step}.
 
+\begin{figure}
+  \includegraphics[width=400px]{pulse_step.png}
+\caption{\label{fig:pulse_step} Pulse Step processing}
+\end{figure}
 
+\begin{figure}
+  \includegraphics[width=400px]{charge_step.png}
+\caption{\label{fig:charge_step} Charging step logic}
+\end{figure}
 
 
 \subsection{The Stepper Controller}
