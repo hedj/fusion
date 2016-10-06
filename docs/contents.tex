@@ -13,6 +13,13 @@ Flowcharts in this section use the visual language from the DRAKON project. See 
 \caption{\label{fig:system} Overall system design}
 \end{figure}
 
+\subsection{The Control Computer}
+
+The control computer is a standard PC presently running Windows 10. It shares its connection to the
+internet via ethernet, which is connected to a hub. Oscilloscopes and the IRC server hang off this hub.
+At present, all the software agents described later run on the control computer, although in principle
+it would be possible to run many of them on other computers.
+
 \subsection{The Bank Controller}
 
 The bank controller is a \href{http://controllino.biz/product/controllino-mega/}{Controllino Mega}; an
@@ -47,8 +54,38 @@ The two operations which consume a reasonable amount of time and are thus implem
 \caption{\label{fig:charge_step} Charging step logic}
 \end{figure}
 
-
 \subsection{The Stepper Controller}
+
+The stepper controller is an Arduino UNO; four pins and mosfets are used to switch an externally-supplied 12V to the poles of a stepper motor. The stepper motor accepts simple serial commands; e.g `F5' for forward 5 milimeters, or `R10' for 'Reverse 10 mm'.
+
 \subsection{The IRC Server}
+
+The IRC server is a raspberry pi running Linux. At present it has the fixed IP address 192.168.137.3.
+The IRC server runs \textsc{ngircd}, an open-source IRC daemon. All user-facing software connects
+to this IRC server. In this fashion, we can easily view and log all messages and commands being issued
+or responded to by the various subsystems.
+
 \subsection{The Agents}
+
+Each important subsystem has its own IRC bot; there is a bankbot which translates commands and messages for the bank controller, a stepperbot for the steppers, and so on. There are also some utility IRC bots. The talkbot does text-to-speech translation, and the sequencebot can perform complex sequences of tasks,
+including sending messages to the other bots.
+
+The complete list of bots (Agents) presently in use is as follows:
+
+\begin{itemize}
+ \item{bankbot  : controls the cap bank and HV power supplies }
+ \item{ipfsbot  : uploads files or directories to IPFS }
+ \item{picobot  : controls the Picoscope 3405D oscilloscope }
+ \item{rigolbot : controls the two DS10x4z oscilloscopes }
+ \item{talkbot  : says things out loud - e.g countdowns }
+ \item{robot    : runs complex sequences of commands }
+\end{itemize}
+
 \subsection{Using the System}
+
+The \textsc{HexChat} application is set up to connect to the IRC server and become the system operator;
+it then connects to the channel called \#system. The run\_bots.bat batch-file (linked to on the desktop) will
+invoke all of the bots, which will then initialise themselves and connect to the same channel.
+
+Sending any of the bots a message of the form ``BOTNAME: help'', e.g `bank: help', will cause
+that bot to reply with a description of all the commands supported by that bot. To issue a command CMD, you can just type ``BOTNAME: CMD''.
