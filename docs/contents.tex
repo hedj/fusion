@@ -82,10 +82,135 @@ The complete list of bots (Agents) presently in use is as follows:
 \end{itemize}
 
 \subsection{Using the System}
-
 The \textsc{HexChat} application is set up to connect to the IRC server and become the system operator;
 it then connects to the channel called \#system. The run\_bots.bat batch-file (linked to on the desktop) will
 invoke all of the bots, which will then initialise themselves and connect to the same channel.
 
 Sending any of the bots a message of the form ``BOTNAME: help'', e.g `bank: help', will cause
 that bot to reply with a description of all the commands supported by that bot. To issue a command CMD, you can just type ``BOTNAME: CMD''.
+
+\subsection{bankbot Command summary}
+
+The bank control robot, bankbot, understands the following commands
+\begin{verbatim}
+  get <PARAMETER_NAME>
+  set <PARAMETER_NAME> <VALUE>
+  reset
+  dry_run <1|0>
+  pulse
+  \abort
+\end{verbatim}
+
+PARAMETER\_NAME can be one of the following:
+\begin{verbatim}
+  pulse_width
+  pulse_delay
+  charge_enable
+  charge_power
+  hv_state
+  hv_voltage
+  bank_voltage
+  switch_state
+\end{verbatim}
+
+The symbolic names True, False, On, and Off, may be used in place of 1 and 0.
+
+\subsection{ipfsbot Command summary}
+
+The ipfsbot understands only 'help' and 'publish'. The command 'publish' expects a path
+as an argument and publishes all the files under that path to the IPFS filesystem. The
+identifying hash value is returned as a URL enabling remote access to the published file.
+
+\subsection{picobot Command summary}
+
+The picoscope control robot, picobot, understands the following commands:
+
+\small{
+\begin{verbatim}
+   start_capture  :  start_capture <TIMEOUT_MS> arms the picoscope for capture
+   channel_config  : configures a chosen channel;
+                       e.g  channel_config <NAME> <COUPLING> <VOLTAGE_RANGE>
+   trig_threshold    sets the voltage threshold (in Volts used for triggering
+   trig_channel   :  sets the channel used for triggering;  e.g "trig_channel A"  
+   status         :  shows device configuration
+   reset_scope    :  disconnects and reconnects scope
+   write_data  :  write_data <PATH_PREFIX> writes the last data set to disk in HDF5 format  
+   channel_names  :  'channel_names <NAME_1> <NAME_2> <NAME_3> <NAME_4> 
+                      names the four device channels'
+   help :  shows this useful message
+\end{verbatim}
+}
+
+\subsection{rigolbot Command summary}
+
+Rigolbot only supports DS10x4z devices at present. The commandset is:
+\small{
+  \begin{verbatim}
+    channel_names :    channel_names <DEVICE_NAME> <NAME_1> <NAME_2> ... 
+                         names the channels of the chosen scope
+    add_device :       add_device <IP> <NAME>  adds the device at IP and names it NAME
+                         (e.g add_device 192.168.137.10 pulse_scope
+    remove_device :    remove_device <NAME> removes the named device
+    status     :       shows information about connected Rigol scopes
+    write_data :       write_data <PATH> writes the current screen contents of each rigol scope to <PATH>
+    help :             shows this useful message
+  \end{verbatim}
+}
+
+\subsection{talkbot Command summary}
+
+Talkbot speaks any message sent to it. If you want talkbot to say 'Hello', you just
+type 'say: Hello' in the \#system IRC channel.
+
+\subsection{robot Command summary}
+
+The sequencing robot, simply called robot, has a complicated commandset. This is because robot.py is essentially a Python interpreter connected to the IRC channel. The initial set
+of commands is given in the file `macrosystem.py', and new commands can be defined at runtime.
+
+The best way to learn to use the robot is to enter `robot: help' into the \#system IRC channel; nevertheless, a brief summary is as follows:
+
+The robot has a few primitives built in:
+\begin{itemize}
+\item{help  -- shows a help message}
+\item{emit(s) -- writes something to the channel, e.g emit("say: 5") }
+\item{wait(s,timeout=1) waits to hear the string s from the IRC channel, or panics after timeout}
+\item{process\_line(s) interprets a string}
+\end{itemize}
+
+The rules for process\_line are as follows:
+\begin{verbatim}
+lines starting with @ are executed
+lines starting with ! are emitted to the channel
+lines starting with # are treated as comments (ignored)
+\end{verbatim}
+
+New commands can be then defined by sending robot messages of the form
+\begin{verbatim}
+def function(arg1, arg2, ..) ->  python_code_line_1; python_code_line_2; ...
+\end{verbatim}
+
+In `macrosystem.py', this facility is used to build up some useful commands:
+
+\tiny{
+\begin{verbatim}
+inputs = [
+  'RUNDIR = r"c:\data\default_rundir"',
+  'def setup_rigols() -> emit("rigol: add_device 192.168.137.10 rigol_1"); wait("Connected to rigol", 5)',
+  'def charge_enable(s) -> emit("bank: set charge_enable " + s)',
+  'def charge_power(s) -> emit("bank: set charge_power " +s)',
+  'def countdown(n) -> [ (emit("say: "+str(d)), wait("OK", 5)) for d in range(n,0,-1) ]',
+  'def setup() -> setup_rigols(); countdown(5); charge_power("on"); sleep(0.5); charge_enable("on")',
+  'def shutdown() -> charge_power("off"); sleep(0.1); charge_enable("off"); emit("Shutdown complete")',
+  'def charge(V) -> emit("bank: charge "+str(V)); wait("charge : OK, value = 0", 30)',
+  'def start_capture() -> emit("picoscope: start_capture 5000")',
+  'def pulse() -> emit("bank: pulse"); wait("pulse : OK, value = 0", 10)',
+  'def collect_data(dir) -> emit("picoscope: write_data " + dir); emit("rigol: write_data " + dir)',
+  'def shot(V, dir) -> charge(V); start_capture(); pulse(); sleep(1); collect_data(dir); sleep(10)',
+  'def run_file(filename) -> state.seq = 1; [  process_line(line.strip()) for line in open(filename).readlines() ]'
+]
+\end{verbatim}
+}
+
+In the above you can also see that environment variables can be set and used as you might expect.
+
+
